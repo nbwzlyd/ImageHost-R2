@@ -189,3 +189,5 @@ logoutBtn.addEventListener("click", async () => {
     alert('登出失败，请稍后再试。');
   }
 });
+checkLoginStatus();
+
