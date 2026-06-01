@@ -1,5 +1,5 @@
 async function fetchConfig() {
-  const res = await fetch("https://weathered-silence-4lfmyimageapi.420907013.workers.dev/config");
+  const res = await fetch("https://weathered-silence-41fmyimageapi.420907013.workers.dev/config");
   if (!res.ok) throw new Error("获取配置失败");
   return await res.json();
 }
