@@ -1,8 +1,16 @@
 initializeSupabase().then(() => {
-  checkLoginStatus(); // 保证此时 supabase 已经初始化
+  checkLoginStatus();
+}).catch(err => {
+  console.error("Supabase 初始化失败:", err);
+  const statusEl = document.getElementById("user-status");
+  if (statusEl) {
+    const warn = document.createElement("span");
+    warn.className = "text-yellow-400 text-sm";
+    warn.textContent = "⚠️ 服务连接失败，请刷新重试";
+    statusEl.prepend(warn);
+  }
 });
 
-// 显示登录/注册弹窗
 const authModal = document.getElementById("auth-modal");
 const loginRegisterBtn = document.getElementById("login-register-btn");
 const closeAuthModal = document.getElementById("close-auth-modal");
@@ -44,7 +52,6 @@ function showRegisterForm() {
   document.getElementById("register-form").style.display = "block";
 }
 
-// 登录功能
 document.getElementById("login-button").addEventListener("click", async function () {
   const email = document.getElementById("login-email").value.trim();
   const password = document.getElementById("login-password").value.trim();
@@ -52,6 +59,11 @@ document.getElementById("login-button").addEventListener("click", async function
 
   if (!email || !password) {
     alert('请输入邮箱和密码。');
+    return;
+  }
+
+  if (!window._supabaseReady) {
+    alert('系统正在初始化，请稍后再试。');
     return;
   }
 
@@ -73,7 +85,6 @@ document.getElementById("login-button").addEventListener("click", async function
   }
 });
 
-// 注册功能
 document.getElementById("register-button").addEventListener("click", async function () {
   const email = document.getElementById("register-email").value.trim();
   const password = document.getElementById("register-password").value.trim();
@@ -85,6 +96,11 @@ document.getElementById("register-button").addEventListener("click", async funct
     return;
   }
 
+  if (!window._supabaseReady) {
+    alert('系统正在初始化，请稍后再试。');
+    return;
+  }
+
   if (!nickname) {
     nickname = generateRandomNickname();
   }
@@ -93,7 +109,6 @@ document.getElementById("register-button").addEventListener("click", async funct
   registerButton.innerText = "注册中...";
 
   try {
-    // 检查昵称（用户名）是否已存在
     const { data: existingUser, error: checkError } = await supabase
       .from('profiles')
       .select('id')
@@ -106,7 +121,6 @@ document.getElementById("register-button").addEventListener("click", async funct
       return;
     }
 
-    // 注册账号
     const { data: signUpData, error: signUpError } = await supabase.auth.signUp({ email, password });
     if (signUpError) {
       throw new Error(signUpError.message);
@@ -122,7 +136,6 @@ document.getElementById("register-button").addEventListener("click", async funct
       return;
     }
 
-    // 注册成功后，更新 profiles 表的昵称
     const { error: updateError } = await supabase
       .from('profiles')
       .update({ username: nickname })
@@ -143,7 +156,6 @@ document.getElementById("register-button").addEventListener("click", async funct
   }
 });
 
-// 随机生成昵称
 function generateRandomNickname() {
   const adjectives = ["快乐", "闪耀", "机智", "勇敢", "神秘"];
   const animals = ["猫咪", "小狗", "老虎", "兔子", "鲸鱼"];
@@ -153,7 +165,6 @@ function generateRandomNickname() {
   return `${randomAdj}${randomAnimal}${randomNum}`;
 }
 
-// 随机生成头像链接
 function generateRandomAvatar() {
   const seed = Math.random().toString(36).substring(2, 10);
   return `https://api.dicebear.com/7.x/bottts/svg?seed=${seed}`;
