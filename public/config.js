@@ -1,5 +1,4 @@
-// 直接初始化 Supabase
-function initializeSupabase() {
+async function initializeSupabase() {
   window.IMG_BED_CONFIG = {
     apiBaseUrl: "https://weathered-silence-41fmyimageapi.420907013.workers.dev",
     supabaseUrl: "https://smbreqhzvkmnkzmmrudn.supabase.co",
