@@ -1,4 +1,3 @@
-/* 页面整体布局 */
 body {
   font-family: Arial, sans-serif;
   background-size: cover;
@@ -12,24 +11,20 @@ body {
   color: white;
 }
 
-
-/* 主体内容块 */
 .container {
   max-width: 600px;
   margin: 50px auto;
   padding: 30px;
-  background: rgba(255, 255, 255, 0.8); /* 白色半透明 */
+  background: rgba(255, 255, 255, 0.8);
   border-radius: 10px;
   text-align: center;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* 文件上传框 */
 input[type="file"] {
   margin: 20px 0;
 }
 
-/* 按钮样式 */
 button {
   padding: 10px 20px;
   background-color: #0070f3;
@@ -43,7 +38,6 @@ button:hover {
   background-color: #0055cc;
 }
 
-/* 登录注册输入框 */
 #auth-forms input {
   display: block;
   width: 100%;
@@ -53,7 +47,6 @@ button:hover {
   box-sizing: border-box;
 }
 
-/* 弹窗蒙层 */
 .modal {
   display: flex;
   justify-content: center;
@@ -64,7 +57,6 @@ button:hover {
   z-index: 999;
 }
 
-/* 弹窗内容 */
 .modal-content {
   background: #fff;
   padding: 24px;
@@ -73,12 +65,10 @@ button:hover {
   position: relative;
 }
 
-/* 隐藏元素 */
 .hidden {
   display: none;
 }
 
-/* 关闭按钮 */
 .close-button {
   position: absolute;
   right: 12px;
@@ -87,28 +77,204 @@ button:hover {
   cursor: pointer;
 }
 
-/* 让登录/注册按钮和下拉框透明 */
 #login-register-btn {
-  background-color: rgba(59, 130, 246, 0); /* 完全透明 */
-  color: rgba(255, 255, 255, 0); /* 完全透明文字 */
-  border: none; /* 去掉边框 */
+  background-color: rgba(59, 130, 246, 0);
+  color: rgba(255, 255, 255, 0);
+  border: none;
 }
 
 #user-profile {
-  background-color: rgba(59, 130, 246, 0); /* 完全透明背景 */
+  background-color: rgba(59, 130, 246, 0);
 }
 
 #dropdown-menu {
-  background-color: rgba(255, 255, 255, 0); /* 完全透明背景 */
-  box-shadow: none; /* 去掉阴影 */
-  display: none; /* 隐藏下拉菜单 */
+  background-color: rgba(255, 255, 255, 0);
+  box-shadow: none;
+  display: none;
 }
 
-/* 在用户已登录时，保持透明但仍可点击的状态 */
 #login-register-btn.hidden {
   display: none;
 }
 
 #user-profile.hidden {
   display: none;
+}
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  padding: 0;
+}
+
+.gallery-card {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.gallery-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+
+.gallery-thumb-wrapper {
+  position: relative;
+  width: 100%;
+  padding-top: 75%;
+  overflow: hidden;
+  background: #f3f4f6;
+}
+
+.gallery-thumb {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.gallery-card:hover .gallery-thumb {
+  transform: scale(1.05);
+}
+
+.gallery-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.gallery-card:hover .gallery-overlay {
+  opacity: 1;
+}
+
+.gallery-zoom-icon {
+  font-size: 2rem;
+  filter: drop-shadow(0 1px 3px rgba(0,0,0,0.4));
+}
+
+.gallery-card-info {
+  padding: 10px 12px;
+}
+
+.gallery-card-name {
+  font-size: 0.8rem;
+  color: #374151;
+  margin: 0 0 2px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gallery-card-size {
+  font-size: 0.7rem;
+  color: #9ca3af;
+  margin: 0;
+}
+
+.lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.88);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.lightbox-overlay.hidden {
+  display: none;
+}
+
+.lightbox-content {
+  max-width: 90vw;
+  max-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lightbox-content img {
+  max-width: 90vw;
+  max-height: 80vh;
+  object-fit: contain;
+  border-radius: 6px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+  user-select: none;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 16px;
+  right: 24px;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 2.5rem;
+  cursor: pointer;
+  z-index: 10001;
+  line-height: 1;
+  padding: 4px 10px;
+  transition: opacity 0.2s;
+}
+
+.lightbox-close:hover {
+  opacity: 0.7;
+}
+
+.lightbox-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  color: white;
+  font-size: 3rem;
+  cursor: pointer;
+  z-index: 10001;
+  padding: 12px 16px;
+  border-radius: 8px;
+  transition: background 0.2s;
+  user-select: none;
+  line-height: 1;
+}
+
+.lightbox-nav:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.lightbox-prev {
+  left: 16px;
+}
+
+.lightbox-next {
+  right: 16px;
+}
+
+.lightbox-info {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.85rem;
+  margin-top: 16px;
+  text-align: center;
+  user-select: none;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
 }

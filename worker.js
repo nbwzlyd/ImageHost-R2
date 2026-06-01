@@ -106,10 +106,30 @@ export default {
       const list = await env.R2_BUCKET.list({ limit: 1000 });
       const files = list.objects;
 
+      files.sort((a, b) => b.created - a.created);
+
+      const acceptHeader = request.headers.get('Accept') || '';
+      const preferJson = acceptHeader.includes('application/json') ||
+                         url.searchParams.get('format') === 'json';
+
+      if (preferJson) {
+        const jsonData = files.map(obj => ({
+          key: obj.key,
+          url: `${url.origin}/${obj.key}`,
+          size: obj.size,
+          created: obj.created
+        }));
+
+        return new Response(JSON.stringify({ files: jsonData }), {
+          headers: {
+            "Content-Type": "application/json",
+            ...corsHeaders()
+          }
+        });
+      }
+
       let html = `<html><head><meta charset="UTF-8"><title>图片列表</title></head><body>`;
       html += `<h2>🖼 已上传图片 (${files.length})</h2><ul style="list-style: none; padding: 0;">`;
-
-      files.sort((a, b) => b.created - a.created); // 按照创建时间倒序排序
 
       for (const obj of files) {
         const fileUrl = `${url.origin}/${obj.key}`;

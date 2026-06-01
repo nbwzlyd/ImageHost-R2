@@ -1,5 +1,4 @@
 
-// 1. 页面元素
 const closeAuthModalBtn = document.getElementById("close-auth-modal");
 const userProfile = document.getElementById("user-profile");
 const profileBtn = document.getElementById("profile-btn");
@@ -8,17 +7,14 @@ const profileUsername = document.getElementById("profile-username");
 const dropdownMenu = document.getElementById("dropdown-menu");
 const logoutBtn = document.getElementById("logout-btn");
 
-// 中间主体容器
 const mainContent = document.getElementById("main-content");
 
-// 导航按钮
 const uploadBtn = document.getElementById("upload-btn");
 const galleryBtn = document.getElementById("gallery-btn");
 const myProfileBtn = document.getElementById("my-profile-btn");
 
 let currentSession = null;
 
-// 2. 检查登录状态并更新页面
 async function checkLoginStatus() {
   try {
     const { data: { session } } = await supabase.auth.getSession();
@@ -50,7 +46,6 @@ async function checkLoginStatus() {
   }
 }
 
-// 3. 登录/弹窗控制
 loginRegisterBtn.addEventListener("click", () => {
   authModal.classList.remove("hidden");
 });
@@ -59,7 +54,6 @@ closeAuthModalBtn.addEventListener("click", () => {
   authModal.classList.add("hidden");
 });
 
-// 4. 头像下拉菜单
 profileBtn.addEventListener("click", (e) => {
   e.stopPropagation();
   dropdownMenu.classList.toggle("hidden");
@@ -71,7 +65,6 @@ document.addEventListener("click", (e) => {
   }
 });
 
-// 5. 登出
 logoutBtn.addEventListener("click", async () => {
   try {
     await supabase.auth.signOut();
@@ -82,12 +75,10 @@ logoutBtn.addEventListener("click", async () => {
   }
 });
 
-// 6. 页面切换函数
 function clearMainContent() {
   mainContent.innerHTML = "";
 }
 
-// 加载上传图片页面
 async function loadUploadPage() {
   clearMainContent();
 
@@ -102,6 +93,12 @@ async function loadUploadPage() {
           开始上传
         </button>
       </form>
+      <div id="upload-progress-container" style="display: none;" class="mt-6">
+        <div class="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
+          <div id="upload-progress-bar" class="h-4 rounded-full transition-all duration-300 ease-out" style="width: 0%; background-color: #3b82f6;"></div>
+        </div>
+        <p id="upload-progress-text" class="text-sm text-gray-600 mt-2">0%</p>
+      </div>
       <div id="result" class="mt-6 text-gray-700"></div>
     </div>
   `;
@@ -113,42 +110,177 @@ async function loadUploadPage() {
   });
 }
 
-
-// 加载图片列表页面（改为跳转到 API 提供的清单页面）
-let hasOpenedGallery = false;
-
-function loadGalleryPage() {
-  if (hasOpenedGallery) return; // 避免多次触发
-  hasOpenedGallery = true;
+async function loadGalleryPage() {
+  clearMainContent();
 
   const config = window.IMG_BED_CONFIG || {};
   const apiBaseUrl = config.apiBaseUrl || "http://localhost:8787";
   const imageListPath = config.imageListPath || "/list";
 
-  const fullUrl = `${apiBaseUrl.replace(/\/$/, '')}${imageListPath.startsWith('/') ? '' : '/'}${imageListPath}`;
-  window.open(fullUrl, '_blank');
+  mainContent.innerHTML = `
+    <div class="w-full max-w-6xl">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-3xl font-bold text-gray-800">🖼 图片画廊</h2>
+        <button id="gallery-refresh-btn" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-sm transition">
+          刷新
+        </button>
+      </div>
+      <div id="gallery-loading" class="text-center py-10">
+        <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-blue-500 border-t-transparent"></div>
+        <p class="text-gray-600 mt-3">加载图片中...</p>
+      </div>
+      <div id="gallery-grid" class="gallery-grid hidden"></div>
+      <div id="gallery-empty" class="text-center py-10 hidden">
+        <p class="text-gray-500 text-lg">暂无图片</p>
+      </div>
+    </div>
+
+    <div id="lightbox-overlay" class="lightbox-overlay hidden">
+      <button id="lightbox-close" class="lightbox-close">&times;</button>
+      <button id="lightbox-prev" class="lightbox-nav lightbox-prev">&#8249;</button>
+      <button id="lightbox-next" class="lightbox-nav lightbox-next">&#8250;</button>
+      <div class="lightbox-content">
+        <img id="lightbox-img" src="" alt="" />
+      </div>
+      <div id="lightbox-info" class="lightbox-info"></div>
+    </div>
+  `;
+
+  let galleryImages = [];
+  let currentIndex = 0;
+
+  async function fetchImages() {
+    const loadingEl = document.getElementById("gallery-loading");
+    const gridEl = document.getElementById("gallery-grid");
+    const emptyEl = document.getElementById("gallery-empty");
+
+    loadingEl.classList.remove("hidden");
+    gridEl.classList.add("hidden");
+    emptyEl.classList.add("hidden");
+
+    try {
+      const fullUrl = `${apiBaseUrl.replace(/\/$/, '')}${imageListPath.startsWith('/') ? '' : '/'}${imageListPath}?format=json`;
+      const res = await fetch(fullUrl);
+      const data = await res.json();
+
+      galleryImages = data.files || [];
+
+      loadingEl.classList.add("hidden");
+
+      if (galleryImages.length === 0) {
+        emptyEl.classList.remove("hidden");
+        return;
+      }
+
+      gridEl.classList.remove("hidden");
+      renderGallery(galleryImages);
+    } catch (error) {
+      loadingEl.classList.add("hidden");
+      gridEl.innerHTML = `<p class="text-red-500 text-center py-10">加载失败：${error.message}</p>`;
+      gridEl.classList.remove("hidden");
+    }
+  }
+
+  function renderGallery(images) {
+    const gridEl = document.getElementById("gallery-grid");
+    gridEl.innerHTML = "";
+
+    images.forEach((img, index) => {
+      const card = document.createElement("div");
+      card.className = "gallery-card";
+      card.innerHTML = `
+        <div class="gallery-thumb-wrapper">
+          <img src="${img.url}" alt="${img.key}" class="gallery-thumb" loading="lazy" />
+          <div class="gallery-overlay">
+            <span class="gallery-zoom-icon">🔍</span>
+          </div>
+        </div>
+        <div class="gallery-card-info">
+          <p class="gallery-card-name" title="${img.key}">${img.key}</p>
+          <p class="gallery-card-size">${formatSize(img.size)}</p>
+        </div>
+      `;
+      card.addEventListener("click", () => openLightbox(index));
+      gridEl.appendChild(card);
+    });
+  }
+
+  function formatSize(bytes) {
+    if (!bytes) return "";
+    if (bytes < 1024) return bytes + " B";
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+    return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+  }
+
+  function openLightbox(index) {
+    currentIndex = index;
+    const overlay = document.getElementById("lightbox-overlay");
+    const img = document.getElementById("lightbox-img");
+    const info = document.getElementById("lightbox-info");
+
+    img.src = galleryImages[index].url;
+    info.textContent = `${galleryImages[index].key}  ·  ${formatSize(galleryImages[index].size)}  ·  ${index + 1} / ${galleryImages.length}`;
+
+    overlay.classList.remove("hidden");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeLightbox() {
+    const overlay = document.getElementById("lightbox-overlay");
+    overlay.classList.add("hidden");
+    document.body.style.overflow = "";
+  }
+
+  function navigateLightbox(direction) {
+    currentIndex = (currentIndex + direction + galleryImages.length) % galleryImages.length;
+    const img = document.getElementById("lightbox-img");
+    const info = document.getElementById("lightbox-info");
+
+    img.src = galleryImages[currentIndex].url;
+    info.textContent = `${galleryImages[currentIndex].key}  ·  ${formatSize(galleryImages[currentIndex].size)}  ·  ${currentIndex + 1} / ${galleryImages.length}`;
+  }
+
+  document.getElementById("lightbox-close").addEventListener("click", closeLightbox);
+  document.getElementById("lightbox-overlay").addEventListener("click", (e) => {
+    if (e.target === e.currentTarget) closeLightbox();
+  });
+  document.getElementById("lightbox-prev").addEventListener("click", (e) => {
+    e.stopPropagation();
+    navigateLightbox(-1);
+  });
+  document.getElementById("lightbox-next").addEventListener("click", (e) => {
+    e.stopPropagation();
+    navigateLightbox(1);
+  });
+
+  document.addEventListener("keydown", function lightboxKeyHandler(e) {
+    const overlay = document.getElementById("lightbox-overlay");
+    if (!overlay || overlay.classList.contains("hidden")) return;
+
+    if (e.key === "Escape") closeLightbox();
+    if (e.key === "ArrowLeft") navigateLightbox(-1);
+    if (e.key === "ArrowRight") navigateLightbox(1);
+  });
+
+  document.getElementById("gallery-refresh-btn").addEventListener("click", fetchImages);
+
+  await fetchImages();
 }
 
-
-
-// 加载个人资料编辑页面
 async function loadProfilePage() {
   clearMainContent();
 
   mainContent.innerHTML = `
- 
     <div id="profile-form-container"></div>
   `;
 
   import('./profile.js').then(module => {
-    module.loadProfilePage(currentSession);  // ✅ 正确地调用
+    module.loadProfilePage(currentSession);
   }).catch(err => {
     console.error('加载资料模块失败', err);
   });
 }
 
-
-// 7. 登录检查辅助函数
 function requireLoginThen(action) {
   if (!currentSession) {
     authModal.classList.remove("hidden");
@@ -157,7 +289,6 @@ function requireLoginThen(action) {
   }
 }
 
-// 8. 监听导航按钮
 if (uploadBtn) {
   uploadBtn.addEventListener("click", () => requireLoginThen(loadUploadPage));
 }
@@ -168,22 +299,19 @@ if (myProfileBtn) {
   myProfileBtn.addEventListener("click", () => requireLoginThen(loadProfilePage));
 }
 
-// 9. 首页“开始上传图片”按钮
 const startUploadBtn = document.getElementById("start-upload-btn");
 if (startUploadBtn) {
   startUploadBtn.addEventListener("click", () => requireLoginThen(loadUploadPage));
 }
 
-// 页面切换函数
 uploadBtn.addEventListener("click", loadUploadPage);
 galleryBtn.addEventListener("click", loadGalleryPage);
 myProfileBtn.addEventListener("click", loadProfilePage);
 
-// 退出登录功能
 logoutBtn.addEventListener("click", async () => {
   try {
     await supabase.auth.signOut();
-    window.location.reload(); // 重载页面，清除登录状态
+    window.location.reload();
   } catch (error) {
     console.error('登出失败', error);
     alert('登出失败，请稍后再试。');
