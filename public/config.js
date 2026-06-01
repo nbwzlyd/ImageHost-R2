@@ -6,9 +6,11 @@ async function initializeSupabase() {
     maxFiles: "5",
     imageListPath: "/list"
   };
-  
+
   window.supabase = window.supabase.createClient(
     window.IMG_BED_CONFIG.supabaseUrl,
     window.IMG_BED_CONFIG.supabaseAnonKey
   );
 }
+
+initializeSupabase();
