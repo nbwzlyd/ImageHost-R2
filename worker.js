@@ -11,9 +11,10 @@ export default {
 
     // 定义允许的来源（可以根据实际需求修改）
     const allowedOrigins = [
-      'https://myimgbed.pages.dev',  // Cloudflare Pages 正式地址
-      'https://username.github.io',  // GitHub Pages 地址
-      'http://localhost:8787'        // 本地开发调试
+      'https://myimgbed.pages.dev',
+      'https://username.github.io',
+      'https://img.montain.top',
+      'http://localhost:8787'
     ];
 
     // 获取请求的 Origin
