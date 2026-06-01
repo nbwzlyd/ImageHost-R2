@@ -89,8 +89,6 @@ document.getElementById("register-button").addEventListener("click", async funct
   registerButton.innerText = "注册中...";
 
   try {
-    
-
     // 检查昵称（用户名）是否已存在
     const { data: existingUser, error: checkError } = await supabase
       .from('profiles')
