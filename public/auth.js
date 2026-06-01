@@ -1,3 +1,7 @@
+initializeSupabase().then(() => {
+  checkLoginStatus(); // 保证此时 supabase 已经初始化
+});
+
 // 显示登录/注册弹窗
 const authModal = document.getElementById("auth-modal");
 const loginRegisterBtn = document.getElementById("login-register-btn");
