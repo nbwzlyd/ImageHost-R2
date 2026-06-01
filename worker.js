@@ -14,6 +14,7 @@ export default {
       'https://myimgbed.pages.dev',
       'https://username.github.io',
       'https://img.montain.top',
+      'https://api.img.montain.top',
       'http://localhost:8787'
     ];
 
