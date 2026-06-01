@@ -1,8 +1,3 @@
-
-initializeSupabase().then(() => {
-  checkLoginStatus(); // 保证此时 supabase 已经初始化
-});
-
 // 显示登录/注册弹窗
 const authModal = document.getElementById("auth-modal");
 const loginRegisterBtn = document.getElementById("login-register-btn");
@@ -112,10 +107,9 @@ document.getElementById("register-button").addEventListener("click", async funct
     // 注册账号
     const { data: signUpData, error: signUpError } = await supabase.auth.signUp({ email, password });
     if (signUpError) {
-      throw new Error(signUpError.message); // 抛出异常，不继续执行后续
+      throw new Error(signUpError.message);
     }
 
-    // 新增这个判断！！！
     if (signUpData.user?.identities.length === 0) {
       alert('该邮箱已经注册过了，请直接登录或检查邮箱验证。');
       return;
@@ -134,7 +128,6 @@ document.getElementById("register-button").addEventListener("click", async funct
 
     if (updateError) {
       console.error('更新昵称失败：', updateError.message);
-      // 不阻止注册流程
     }
 
     alert('注册成功！请检查邮箱完成验证。');
