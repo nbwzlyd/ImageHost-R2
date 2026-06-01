@@ -2,7 +2,7 @@ async function initializeSupabase() {
   window.IMG_BED_CONFIG = {
     apiBaseUrl: "https://weathered-silence-41fmyimageapi.420907013.workers.dev",
     supabaseUrl: "https://smbreqhzvkmnkzmmrudn.supabase.co",
-    supabaseAnonKey: "sb_publishable_TNIPEUHBunrIwrLyqUKCniTXZYTm0HTOEVQZPGQOazKKRBTJgjXg7kSrxrGobIlHrHYisxbPs5FAGXxCg2R0J7E",
+    supabaseAnonKey: "sb_publishable_TNIPEUHBunrIwrLb18LgQQ_UdhdzhwR",
     maxFiles: "5",
     imageListPath: "/list"
   };
