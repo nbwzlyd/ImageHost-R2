@@ -36,13 +36,13 @@
         <h2 class="text-3xl font-bold text-white">🖼 图片画廊</h2>
         <button id="gallery-refresh-btn" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-sm transition">刷新</button>
       </div>
-      <div id="storage-bar" class="mb-4 bg-white bg-opacity-15 backdrop-filter backdrop-blur rounded-lg px-4 py-2.5 text-sm text-white">
-        <div class="flex justify-between mb-1">
-          <span>存储空间</span>
-          <span id="storage-text">加载中...</span>
+      <div id="storage-bar" class="mb-5 bg-black bg-opacity-40 backdrop-filter backdrop-blur-md border border-white border-opacity-10 rounded-xl px-4 py-3 text-sm text-white shadow-lg">
+        <div class="flex justify-between mb-1.5 font-medium">
+          <span class="text-white text-opacity-90">存储空间</span>
+          <span id="storage-text" class="tabular-nums tracking-wide">加载中...</span>
         </div>
-        <div class="w-full bg-gray-700 rounded-full h-2 overflow-hidden">
-          <div id="storage-progress" class="h-2 rounded-full transition-all duration-500" style="width: 0%; background: linear-gradient(90deg, #3b82f6, #22c55e);"></div>
+        <div class="w-full bg-white bg-opacity-10 rounded-full h-2 overflow-hidden">
+          <div id="storage-progress" class="h-2 rounded-full transition-all duration-700 ease-out" style="width: 0%; background: linear-gradient(90deg, #3b82f6, #22c55e);"></div>
         </div>
       </div>
       <div id="gallery-loading" class="text-center py-10">
@@ -147,6 +147,8 @@
           loadingEl.classList.add("hidden");
           gridEl.innerHTML = `<p class="text-red-500 text-center py-10">加载失败：${error.message}</p>`;
           gridEl.classList.remove("hidden");
+          document.getElementById("storage-text").textContent = "获取失败";
+          document.getElementById("storage-progress").style.width = "0%";
         }
       }
 
