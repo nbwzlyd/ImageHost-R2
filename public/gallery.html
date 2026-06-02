@@ -11,33 +11,20 @@
 </head>
 <body class="bg-cover bg-center bg-no-repeat font-sans flex flex-col min-h-screen" style="background-image: url('assets/background.jpeg');">
 
-  <header class="bg-transparent text-white p-4">
-    <div class="container mx-auto flex justify-between items-center">
-      <a href="index.html" class="flex items-center space-x-2">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9.75L12 4l9 5.75v8.25a2.25 2.25 0 01-2.25 2.25h-2.25V15a2.25 2.25 0 00-2.25-2.25h-3A2.25 2.25 0 009.75 15v5.25H7.5A2.25 2.25 0 015.25 18V9.75z"></path></svg>
-        <h1 class="text-2xl font-semibold">NBVIL 图床</h1>
-      </a>
-      <div id="user-status" class="flex items-center space-x-4">
-        <button id="login-register-btn" class="bg-blue-500 bg-opacity-10 hover:bg-opacity-25 text-white px-4 py-2 rounded-md text-sm transition duration-300">登录/注册</button>
-        <div id="user-profile" class="relative hidden">
-          <button id="profile-btn" class="flex items-center bg-blue-500 bg-opacity-10 hover:bg-opacity-25 text-white px-4 py-2 rounded-md text-sm focus:outline-none transition duration-300">
-            <img id="profile-avatar" src="" alt="头像" class="w-8 h-8 rounded-full mr-2">
-            <span id="profile-username" class="text-sm"></span>
-          </button>
-          <div id="dropdown-menu" class="absolute right-0 mt-2 w-auto bg-white bg-opacity-30 backdrop-blur-md rounded-md shadow-lg hidden">
-            <a href="upload.html" id="upload-btn" class="flex items-center px-4 py-2 text-gray-800 hover:bg-white hover:bg-opacity-40 transition-all duration-300 whitespace-nowrap">
-              <svg class="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M16 8l-4-4m0 0L8 8m4-4v12"></path></svg>上传图片
-            </a>
-            <a href="gallery.html" id="gallery-btn" class="flex items-center px-4 py-2 text-gray-800 hover:bg-white hover:bg-opacity-40 transition-all duration-300 whitespace-nowrap">
-              <svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>图片列表
-            </a>
-            <a href="profile.html" id="my-profile-btn" class="flex items-center px-4 py-2 text-gray-800 hover:bg-white hover:bg-opacity-40 transition-all duration-300 whitespace-nowrap">
-              <svg class="w-5 h-5 mr-2 text-yellow-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>个人信息
-            </a>
-            <button id="logout-btn" class="flex items-center w-full text-left px-4 py-2 text-gray-800 hover:bg-white hover:bg-opacity-40 transition-all duration-300 whitespace-nowrap">
-              <svg class="w-5 h-5 mr-2 text-red-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 11-6 0v-1"></path></svg>退出登录
-            </button>
-          </div>
+  <!-- 右上角登录状态 -->
+  <header class="fixed top-0 right-0 p-4 z-50">
+    <div id="user-status" class="flex items-center space-x-2">
+      <button id="login-register-btn" class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-3 py-1.5 rounded text-sm transition duration-300">登录/注册</button>
+      <div id="user-profile" class="relative hidden">
+        <button id="profile-btn" class="flex items-center bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-3 py-1.5 rounded text-sm focus:outline-none transition duration-300">
+          <img id="profile-avatar" src="" alt="头像" class="w-6 h-6 rounded-full mr-2">
+          <span id="profile-username" class="text-sm"></span>
+        </button>
+        <div id="dropdown-menu" class="absolute right-0 mt-1 w-auto bg-white rounded shadow-lg hidden">
+          <a href="upload.html" id="upload-btn" class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 transition text-sm whitespace-nowrap">上传图片</a>
+          <a href="gallery.html" id="gallery-btn" class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 transition text-sm whitespace-nowrap">图片列表</a>
+          <a href="profile.html" id="my-profile-btn" class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 transition text-sm whitespace-nowrap">个人信息</a>
+          <button id="logout-btn" class="flex items-center w-full text-left px-4 py-2 text-red-500 hover:bg-gray-100 transition text-sm whitespace-nowrap">退出登录</button>
         </div>
       </div>
     </div>
@@ -46,16 +33,16 @@
   <main class="flex-grow flex justify-center p-8">
     <div class="w-full max-w-6xl">
       <div class="flex items-center justify-between mb-6">
-        <h2 class="text-3xl font-bold text-gray-800">🖼 图片画廊</h2>
+        <h2 class="text-3xl font-bold text-white">🖼 图片画廊</h2>
         <button id="gallery-refresh-btn" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-sm transition">刷新</button>
       </div>
       <div id="gallery-loading" class="text-center py-10">
         <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-blue-500 border-t-transparent"></div>
-        <p class="text-gray-600 mt-3">加载图片中...</p>
+        <p class="text-white mt-3">加载图片中...</p>
       </div>
       <div id="gallery-grid" class="gallery-grid hidden"></div>
       <div id="gallery-empty" class="text-center py-10 hidden">
-        <p class="text-gray-500 text-lg">暂无图片</p>
+        <p class="text-white text-lg">暂无图片</p>
       </div>
     </div>
 
@@ -94,15 +81,6 @@
     </div>
   </div>
 
-  <footer class="bg-transparent text-white mt-auto py-6 text-sm">
-    <div class="container mx-auto flex flex-col items-center space-y-4 px-4">
-      <div class="text-center"><p>© 2025 NBVIL 图床. All rights reserved.</p></div>
-      <div class="flex space-x-6">
-        <a href="https://github.com/sindricn/ImageHost-R2" target="_blank" class="flex items-center space-x-1 hover:text-blue-400 transition"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.373 0 12a12 12 0 008.207 11.387c.6.11.793-.26.793-.577v-2.021c-3.338.727-4.042-1.415-4.042-1.415-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.239 1.839 1.239 1.07 1.834 2.807 1.304 3.492.997.108-.775.418-1.305.762-1.605-2.665-.303-5.467-1.334-5.467-5.931 0-1.31.468-2.382 1.236-3.222-.124-.303-.536-1.523.117-3.176 0 0 1.008-.323 3.3 1.23a11.49 11.49 0 013.003-.404c1.02.005 2.045.138 3.003.404 2.29-1.553 3.297-1.23 3.297-1.23.655 1.653.243 2.873.12 3.176.77.84 1.235 1.912 1.235 3.222 0 4.609-2.807 5.624-5.48 5.921.43.372.823 1.103.823 2.222v3.293c0 .32.192.694.801.576A12.002 12.002 0 0024 12c0-6.627-5.373-12-12-12z"/></svg><span>GitHub</span></a>
-        <a href="mailto:nbvil.sindri@gmail.com" class="flex items-center space-x-1 hover:text-blue-400 transition"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zm0 2v.01L12 13l8-6.99V6H4zm0 2.5v9.5h16v-9.5l-8 5-8-5z"/></svg><span>联系我们</span></a>
-      </div>
-    </div>
-  </footer>
 
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
@@ -116,7 +94,7 @@
       }
 
       const config = window.IMG_BED_CONFIG || {};
-      const apiBaseUrl = config.apiBaseUrl || "https://api.img.montain.top";
+      const apiBaseUrl = config.apiBaseUrl || window.location.origin;
       const imageListPath = config.imageListPath || "/list";
 
       let galleryImages = [];

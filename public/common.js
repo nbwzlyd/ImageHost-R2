@@ -4,7 +4,7 @@ let currentSession = null;
 
 async function initializeSupabase() {
   window.IMG_BED_CONFIG = {
-    apiBaseUrl: "https://api.img.montain.top",
+    apiBaseUrl: window.location.origin,
     supabaseUrl: "https://smbreqhzvkmnkzmmrudn.supabase.co",
     supabaseAnonKey: "sb_publishable_TNIPEUHBunrIwrLb18LgQQ_UdhdzhwR",
     maxFiles: "5",
