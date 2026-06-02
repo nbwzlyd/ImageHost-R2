@@ -90,7 +90,6 @@ button:hover {
 #dropdown-menu {
   background-color: rgba(255, 255, 255, 0);
   box-shadow: none;
-  display: none;
 }
 
 #login-register-btn.hidden {
