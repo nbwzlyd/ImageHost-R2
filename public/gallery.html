@@ -134,12 +134,37 @@
             <div class="gallery-thumb-wrapper">
               <img src="${img.url}" alt="${img.key}" class="gallery-thumb" loading="lazy" />
               <div class="gallery-overlay"><span class="gallery-zoom-icon">🔍</span></div>
+              <button class="gallery-delete-btn" title="删除">🗑</button>
             </div>
             <div class="gallery-card-info">
               <p class="gallery-card-name" title="${img.key}">${img.key}</p>
               <p class="gallery-card-size">${formatSize(img.size)}</p>
             </div>`;
-          card.addEventListener("click", () => openLightbox(index));
+
+          // 缩略图点击 → 预览
+          card.querySelector(".gallery-thumb-wrapper").addEventListener("click", (e) => {
+            if (e.target.closest(".gallery-delete-btn")) return;
+            openLightbox(index);
+          });
+
+          // 删除按钮
+          card.querySelector(".gallery-delete-btn").addEventListener("click", async (e) => {
+            e.stopPropagation();
+            if (!confirm(`确定删除 ${img.key} ？`)) return;
+            try {
+              const res = await fetch(`${apiBaseUrl}/images/${encodeURIComponent(img.key)}`, { method: "DELETE" });
+              if (res.ok) {
+                card.style.opacity = "0";
+                card.style.transition = "opacity 0.3s";
+                setTimeout(() => card.remove(), 300);
+              } else {
+                alert("删除失败");
+              }
+            } catch {
+              alert("网络错误");
+            }
+          });
+
           gridEl.appendChild(card);
         });
       }
