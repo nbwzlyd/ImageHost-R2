@@ -1,5 +1,5 @@
 async function fetchConfig() {
-  const res = await fetch("https://api.img.montain.top/config");
+  const res = await fetch("./config");
   if (!res.ok) throw new Error("获取配置失败");
   return await res.json();
 }
