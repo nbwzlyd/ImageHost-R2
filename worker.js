@@ -1,3 +1,13 @@
+// 生成10位短随机ID，64^10 ≈ 1.1×10^18 组合空间
+function shortId() {
+  const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz';
+  const arr = new Uint8Array(10);
+  crypto.getRandomValues(arr);
+  let id = '';
+  for (let i = 0; i < 10; i++) id += chars[arr[i] & 63];
+  return id;
+}
+
 export default {
   async fetch(request, env) {
     // 配置对象
@@ -84,7 +94,7 @@ export default {
         }
 
         const ext = file.name.split('.').pop();
-        const fileName = `${crypto.randomUUID()}.${ext}`;
+        const fileName = `${shortId()}.${ext}`;
 
         await env.R2_BUCKET.put(fileName, file.stream(), {
           httpMetadata: {
