@@ -11,8 +11,8 @@ initializeSupabase().then(() => {
   }
 });
 
-const authModal = document.getElementById("auth-modal");
-const loginRegisterBtn = document.getElementById("login-register-btn");
+var authModal = document.getElementById("auth-modal");
+var loginRegisterBtn = document.getElementById("login-register-btn");
 const closeAuthModal = document.getElementById("close-auth-modal");
 
 loginRegisterBtn.addEventListener("click", () => {
