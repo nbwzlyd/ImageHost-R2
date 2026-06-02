@@ -137,8 +137,9 @@
         const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/webp', WEBP_QUALITY));
         if (blob.size >= file.size) return file;
 
-        const extIndex = file.name.lastIndexOf('.');
-        const baseName = extIndex > 0 ? file.name.slice(0, extIndex) : file.name;
+        const origName = (file.name && file.name !== 'undefined') ? file.name : 'image.png';
+        const extIndex = origName.lastIndexOf('.');
+        const baseName = extIndex > 0 ? origName.slice(0, extIndex) : origName;
         return new File([blob], `${baseName}.webp`, { type: 'image/webp' });
       }
 

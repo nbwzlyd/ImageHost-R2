@@ -43,7 +43,8 @@ export async function onRequestPost(context) {
       );
     }
 
-    const ext = file.name.split(".").pop();
+    const name = (typeof file.name === 'string' && file.name !== 'undefined') ? file.name : 'image.png';
+    const ext = name.split(".").pop() || 'png';
     const fileName = `${shortId()}.${ext}`;
 
     await env.R2_BUCKET.put(fileName, file.stream(), {
