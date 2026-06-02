@@ -12,10 +12,7 @@
   <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 
-  <!-- 配置和主逻辑 -->
-  <script src="config.js" defer></script> 
-  <script src="auth.js" defer></script> 
-  <script src="index.js" defer></script> 
+  <script src="common.js" defer></script>
   
 </head>
 
@@ -51,7 +48,7 @@
           <!-- 下拉菜单 -->
           <div id="dropdown-menu" class="absolute right-0 mt-2 w-auto bg-white bg-opacity-30 backdrop-blur-md rounded-md shadow-lg hidden">
             <!-- 上传图片 -->
-            <a href="javascript:void(0);" id="upload-btn" class="flex items-center px-4 py-2 text-gray-800 hover:bg-white hover:bg-opacity-40 transition-all duration-300 whitespace-nowrap">
+            <a href="upload.html" id="upload-btn" class="flex items-center px-4 py-2 text-gray-800 hover:bg-white hover:bg-opacity-40 transition-all duration-300 whitespace-nowrap">
               <svg class="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M16 8l-4-4m0 0L8 8m4-4v12"></path>
               </svg>
@@ -59,7 +56,7 @@
             </a>
           
             <!-- 图片列表 -->
-            <a href="javascript:void(0);" id="gallery-btn" class="flex items-center px-4 py-2 text-gray-800 hover:bg-white hover:bg-opacity-40 transition-all duration-300 whitespace-nowrap">
+            <a href="gallery.html" id="gallery-btn" class="flex items-center px-4 py-2 text-gray-800 hover:bg-white hover:bg-opacity-40 transition-all duration-300 whitespace-nowrap">
               <svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
               </svg>
@@ -67,7 +64,7 @@
             </a>
           
             <!-- 个人信息 -->
-            <a href="javascript:void(0);" id="my-profile-btn" class="flex items-center px-4 py-2 text-gray-800 hover:bg-white hover:bg-opacity-40 transition-all duration-300 whitespace-nowrap">
+            <a href="profile.html" id="my-profile-btn" class="flex items-center px-4 py-2 text-gray-800 hover:bg-white hover:bg-opacity-40 transition-all duration-300 whitespace-nowrap">
               <svg class="w-5 h-5 mr-2 text-yellow-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
               </svg>
