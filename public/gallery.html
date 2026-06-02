@@ -53,6 +53,9 @@
       <div id="gallery-empty" class="text-center py-10 hidden">
         <p class="text-white text-lg">暂无图片</p>
       </div>
+      <div id="gallery-load-more" class="text-center py-6 hidden">
+        <button id="load-more-btn" class="bg-white bg-opacity-15 hover:bg-opacity-25 text-white px-6 py-2.5 rounded-lg text-sm transition backdrop-blur">加载更多</button>
+      </div>
     </div>
 
     <div id="lightbox-overlay" class="lightbox-overlay hidden">
@@ -108,25 +111,51 @@
 
       let galleryImages = [];
       let currentIndex = 0;
-
+      let currentOffset = 0;
+      let hasMore = false;
+      const PAGE_LIMIT = 50;
       const FREE_TIER_BYTES = 10 * 1024 * 1024 * 1024; // 10 GB
 
-      async function fetchImages() {
+      async function fetchImages(isLoadMore = false) {
         const loadingEl = document.getElementById("gallery-loading");
         const gridEl = document.getElementById("gallery-grid");
         const emptyEl = document.getElementById("gallery-empty");
-        loadingEl.classList.remove("hidden");
-        gridEl.classList.add("hidden");
-        emptyEl.classList.add("hidden");
+        const loadMoreEl = document.getElementById("gallery-load-more");
+        const loadMoreBtn = document.getElementById("load-more-btn");
+
+        if (!isLoadMore) {
+          loadingEl.classList.remove("hidden");
+          gridEl.classList.add("hidden");
+          emptyEl.classList.add("hidden");
+          loadMoreEl.classList.add("hidden");
+          currentOffset = 0;
+          galleryImages = [];
+          gridEl.innerHTML = "";
+        } else {
+          loadMoreBtn.disabled = true;
+          loadMoreBtn.textContent = "加载中...";
+        }
 
         try {
-          const fullUrl = `${apiBaseUrl.replace(/\/$/, '')}${imageListPath.startsWith('/') ? '' : '/'}${imageListPath}?format=json`;
+          const params = new URLSearchParams({ format: "json", limit: String(PAGE_LIMIT), offset: String(currentOffset) });
+          const fullUrl = `${apiBaseUrl.replace(/\/$/, '')}${imageListPath.startsWith('/') ? '' : '/'}${imageListPath}?${params}`;
           const res = await fetch(fullUrl);
           const data = await res.json();
-          galleryImages = data.files || [];
+          
+          const newImages = data.files || [];
+          hasMore = data.hasMore || false;
+          currentOffset += newImages.length;
 
-          // 计算已用空间
-          const totalBytes = galleryImages.reduce((sum, img) => sum + (img.size || 0), 0);
+          if (isLoadMore) {
+            galleryImages = galleryImages.concat(newImages);
+            renderGallery(newImages, true);
+          } else {
+            galleryImages = newImages;
+            renderGallery(newImages, false);
+          }
+
+          // 用 API 返回的 totalSize 显示总存储（准确的）
+          const totalBytes = data.totalSize || galleryImages.reduce((sum, img) => sum + (img.size || 0), 0);
           const percent = Math.min((totalBytes / FREE_TIER_BYTES) * 100, 100);
           document.getElementById("storage-text").textContent = `${formatSize(totalBytes)} / 10 GB`;
           const bar = document.getElementById("storage-progress");
@@ -142,20 +171,32 @@
           loadingEl.classList.add("hidden");
           if (galleryImages.length === 0) { emptyEl.classList.remove("hidden"); return; }
           gridEl.classList.remove("hidden");
-          renderGallery(galleryImages);
+
+          if (hasMore) {
+            loadMoreEl.classList.remove("hidden");
+            loadMoreBtn.disabled = false;
+            loadMoreBtn.textContent = `加载更多（已显示 ${galleryImages.length} / ${data.total} 张）`;
+          } else {
+            loadMoreEl.classList.add("hidden");
+          }
         } catch (error) {
           loadingEl.classList.add("hidden");
-          gridEl.innerHTML = `<p class="text-red-500 text-center py-10">加载失败：${error.message}</p>`;
-          gridEl.classList.remove("hidden");
+          if (!isLoadMore) {
+            gridEl.innerHTML = `<p class="text-red-500 text-center py-10">加载失败：${error.message}</p>`;
+            gridEl.classList.remove("hidden");
+          }
           document.getElementById("storage-text").textContent = "获取失败";
           document.getElementById("storage-progress").style.width = "0%";
         }
       }
 
-      function renderGallery(images) {
+      function renderGallery(images, append = false) {
         const gridEl = document.getElementById("gallery-grid");
-        gridEl.innerHTML = "";
-        images.forEach((img, index) => {
+        if (!append) gridEl.innerHTML = "";
+
+        const startIndex = append ? galleryImages.length - images.length : 0;
+        images.forEach((img, i) => {
+          const index = startIndex + i;
           const card = document.createElement("div");
           card.className = "gallery-card";
           card.innerHTML = `
@@ -237,8 +278,9 @@
         if (e.key === "ArrowLeft") navigateLightbox(-1);
         if (e.key === "ArrowRight") navigateLightbox(1);
       });
-      document.getElementById("gallery-refresh-btn").addEventListener("click", fetchImages);
-      await fetchImages();
+      document.getElementById("gallery-refresh-btn").addEventListener("click", () => fetchImages(false));
+      document.getElementById("load-more-btn").addEventListener("click", () => fetchImages(true));
+      await fetchImages(false);
     });
   </script>
 </body>

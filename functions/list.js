@@ -3,9 +3,9 @@ export async function onRequestGet(context) {
   const url = new URL(request.url);
   const origin = url.origin;
 
-  const list = await env.R2_BUCKET.list({ limit: 1000 });
-  const files = list.objects;
-  files.sort((a, b) => new Date(b.uploaded) - new Date(a.uploaded));
+  // 加载并排序全部图片（R2 单次上限 1000 条）
+  const fullList = await env.R2_BUCKET.list({ limit: 1000 });
+  const sorted = [...fullList.objects].sort((a, b) => new Date(b.uploaded) - new Date(a.uploaded));
 
   const acceptHeader = request.headers.get("Accept") || "";
   const preferJson =
@@ -13,14 +13,26 @@ export async function onRequestGet(context) {
     url.searchParams.get("format") === "json";
 
   if (preferJson) {
-    const jsonData = files.map((obj) => ({
+    const limit = Math.min(parseInt(url.searchParams.get("limit")) || 50, 50);
+    const offset = parseInt(url.searchParams.get("offset")) || 0;
+
+    const page = sorted.slice(offset, offset + limit);
+    const jsonData = page.map((obj) => ({
       key: obj.key,
       url: `${origin}/images/${obj.key}`,
       size: obj.size,
       uploaded: obj.uploaded,
     }));
+    const totalSize = sorted.reduce((sum, obj) => sum + (obj.size || 0), 0);
 
-    return new Response(JSON.stringify({ files: jsonData }), {
+    return new Response(JSON.stringify({
+      files: jsonData,
+      offset,
+      limit,
+      total: sorted.length,
+      totalSize,
+      hasMore: offset + limit < sorted.length,
+    }), {
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
@@ -43,10 +55,10 @@ export async function onRequestGet(context) {
   .toast { position: fixed; bottom: 20px; right: 20px; background: #333; color: #fff; padding: 10px 20px; border-radius: 6px; font-size: 14px; opacity: 0; transition: opacity 0.3s; z-index: 99; }
   .toast.show { opacity: 1; }
 </style></head><body>
-<h2>图片列表 (${files.length})</h2>
+<h2>图片列表 (${sorted.length})</h2>
 <div class="grid">`;
 
-  for (const obj of files) {
+  for (const obj of sorted) {
     const fileUrl = `${origin}/images/${obj.key}`;
     html += `
   <div class="card" id="card-${obj.key.replace(/[^a-zA-Z0-9]/g, '_')}">
