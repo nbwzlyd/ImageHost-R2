@@ -40,7 +40,7 @@ export async function onRequestPost(context) {
       httpMetadata: { contentType: file.type },
     });
 
-    urls.push(`${origin}/${fileName}`);
+    urls.push(`${origin}/images/${fileName}`);
   }
 
   return new Response(JSON.stringify({ urls }), {

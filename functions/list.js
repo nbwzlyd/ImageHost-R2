@@ -15,7 +15,7 @@ export async function onRequestGet(context) {
   if (preferJson) {
     const jsonData = files.map((obj) => ({
       key: obj.key,
-      url: `${origin}/${obj.key}`,
+      url: `${origin}/images/${obj.key}`,
       size: obj.size,
       uploaded: obj.uploaded,
     }));
@@ -32,7 +32,7 @@ export async function onRequestGet(context) {
   html += `<h2>图片列表 (${files.length})</h2><ul style="list-style: none; padding: 0;">`;
 
   for (const obj of files) {
-    const fileUrl = `${origin}/${obj.key}`;
+    const fileUrl = `${origin}/images/${obj.key}`;
     html += `
       <li style="margin-bottom: 20px;">
         <p><a href="${fileUrl}" target="_blank">${obj.key}</a></p>
