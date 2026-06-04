@@ -11,7 +11,7 @@ function shortId() {
 export async function onRequestPost(context) {
   const { request, env } = context;
 
-  // ===== 1. JWT 鉴权 =====
+  // ===== 1. JWT 鉴权 & 用户识别 =====
   const authHeader = request.headers.get('Authorization');
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return new Response(JSON.stringify({ error: 'Unauthorized: missing token' }), {
@@ -24,8 +24,8 @@ export async function onRequestPost(context) {
   }
 
   const token = authHeader.slice(7);
+  let wpUserId;
 
-  // 调用 WordPress 验证 JWT 令牌有效性
   try {
     const wpRes = await fetch('https://im.montain.top/wp-json/wp/v2/users/me', {
       headers: { Authorization: `Bearer ${token}` },
@@ -39,6 +39,9 @@ export async function onRequestPost(context) {
         },
       });
     }
+    // 取 WordPress 用户 ID
+    const userData = await wpRes.json();
+    wpUserId = userData.id;
   } catch (e) {
     return new Response(JSON.stringify({ error: 'Auth server unavailable' }), {
       status: 503,
@@ -49,7 +52,22 @@ export async function onRequestPost(context) {
     });
   }
 
-  // ===== 2. 处理文件上传 =====
+  // ===== 2. 删除该用户之前的旧头像 =====
+  const mappingKey = `avatar-uid-${wpUserId}`;
+  try {
+    const oldMapping = await env.R2_BUCKET.get(mappingKey);
+    if (oldMapping) {
+      const oldKey = await oldMapping.text();
+      if (oldKey) {
+        // 尝试删除旧文件（忽略错误，可能已被手动删除）
+        await env.R2_BUCKET.delete(oldKey).catch(() => {});
+      }
+    }
+  } catch (e) {
+    // 映射读取失败不应阻塞上传流程
+  }
+
+  // ===== 3. 处理文件上传 =====
   const formData = await request.formData();
   const files = formData.getAll("file");
 
@@ -88,11 +106,15 @@ export async function onRequestPost(context) {
         ? file.name
         : "image.png";
     const ext = name.split(".").pop() || "png";
-    // 头像文件统一放在 avatar- 前缀下，与普通上传隔离
     const fileName = `avatar-${shortId()}.${ext}`;
 
     await env.R2_BUCKET.put(fileName, file.stream(), {
       httpMetadata: { contentType: file.type },
+    });
+
+    // 更新用户头像映射
+    await env.R2_BUCKET.put(mappingKey, fileName, {
+      customMetadata: { userId: String(wpUserId) },
     });
 
     urls.push(`${origin}/images/${fileName}`);
