@@ -54,17 +54,19 @@ export async function onRequestPost(context) {
 
   // ===== 2. 删除该用户之前的旧头像 =====
   const mappingKey = `avatar-uid-${wpUserId}`;
+  let deletedOld = null;
   try {
     const oldMapping = await env.R2_BUCKET.get(mappingKey);
     if (oldMapping) {
-      const oldKey = await oldMapping.text();
+      const oldKey = (await oldMapping.text()).trim();
       if (oldKey) {
-        // 尝试删除旧文件（忽略错误，可能已被手动删除）
-        await env.R2_BUCKET.delete(oldKey).catch(() => {});
+        await env.R2_BUCKET.delete(oldKey);
+        deletedOld = oldKey;
       }
     }
   } catch (e) {
-    // 映射读取失败不应阻塞上传流程
+    // 映射读取或删除失败不应阻塞上传流程，但记录日志
+    console.error('Avatar cleanup error:', e);
   }
 
   // ===== 3. 处理文件上传 =====
@@ -105,7 +107,13 @@ export async function onRequestPost(context) {
       typeof file.name === "string" && file.name !== "undefined"
         ? file.name
         : "image.png";
-    const ext = name.split(".").pop() || "png";
+    // 如果上传的是 WebP，强制扩展名为 webp
+    let ext;
+    if (file.type === "image/webp") {
+      ext = "webp";
+    } else {
+      ext = name.split(".").pop() || "png";
+    }
     const fileName = `avatar-${shortId()}.${ext}`;
 
     await env.R2_BUCKET.put(fileName, file.stream(), {
@@ -120,7 +128,7 @@ export async function onRequestPost(context) {
     urls.push(`${origin}/images/${fileName}`);
   }
 
-  return new Response(JSON.stringify({ urls }), {
+  return new Response(JSON.stringify({ urls, deletedOld }), {
     headers: {
       "Content-Type": "application/json",
       "Access-Control-Allow-Origin": "*",

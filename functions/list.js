@@ -5,7 +5,9 @@ export async function onRequestGet(context) {
 
   // 加载并排序全部图片（R2 单次上限 1000 条）
   const fullList = await env.R2_BUCKET.list({ limit: 1000 });
-  const sorted = [...fullList.objects].sort((a, b) => new Date(b.uploaded) - new Date(a.uploaded));
+  // 过滤掉头像映射记录文件（avatar-uid-xxx），不展示在画廊中
+  const imageObjects = fullList.objects.filter(obj => !obj.key.startsWith('avatar-uid-'));
+  const sorted = [...imageObjects].sort((a, b) => new Date(b.uploaded) - new Date(a.uploaded));
 
   const acceptHeader = request.headers.get("Accept") || "";
   const preferJson =
