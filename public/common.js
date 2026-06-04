@@ -110,7 +110,6 @@ if (loginButton) {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
-      alert(`欢迎回来，${data.user.email}`);
       authModal.classList.add("hidden");
       window.location.reload();
     } catch (err) {
