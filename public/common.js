@@ -7,7 +7,7 @@ async function initializeSupabase() {
     apiBaseUrl: window.location.origin,
     supabaseUrl: "https://smbreqhzvkmnkzmmrudn.supabase.co",
     supabaseAnonKey: "sb_publishable_TNIPEUHBunrIwrLb18LgQQ_UdhdzhwR",
-    maxFiles: "5",
+    maxFiles: "10",
     imageListPath: "/list"
   };
 
